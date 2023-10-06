@@ -6,6 +6,8 @@ package com.mycompany._proyecto_login.igu;
 
 import com.mycompany._proyecto_login.logica.Controladora;
 import com.mycompany._proyecto_login.logica.User;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -32,7 +34,7 @@ public class PrincipalUser extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tablaUsuarios = new javax.swing.JTable();
         btnSalir = new javax.swing.JButton();
         btnRecargar = new javax.swing.JButton();
         txtNombreUser = new javax.swing.JTextField();
@@ -47,7 +49,7 @@ public class PrincipalUser extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Helvetica Neue", 0, 36)); // NOI18N
         jLabel1.setText("Sistema Administrador de Usuarios");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaUsuarios.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
                 {},
@@ -58,7 +60,7 @@ public class PrincipalUser extends javax.swing.JFrame {
 
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tablaUsuarios);
 
         btnSalir.setText("Salir");
         btnSalir.addActionListener(new java.awt.event.ActionListener() {
@@ -68,6 +70,11 @@ public class PrincipalUser extends javax.swing.JFrame {
         });
 
         btnRecargar.setText("Recargar Tabla");
+        btnRecargar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecargarActionPerformed(evt);
+            }
+        });
 
         txtNombreUser.setEditable(false);
         txtNombreUser.setText("jTextField1");
@@ -130,12 +137,17 @@ public class PrincipalUser extends javax.swing.JFrame {
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
         this.txtNombreUser.setText(usr.getUser());
+        cargarTabla();
     }//GEN-LAST:event_formWindowOpened
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void btnRecargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecargarActionPerformed
+        cargarTabla();
+    }//GEN-LAST:event_btnRecargarActionPerformed
 
  
 
@@ -145,7 +157,32 @@ public class PrincipalUser extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tablaUsuarios;
     private javax.swing.JTextField txtNombreUser;
     // End of variables declaration//GEN-END:variables
+
+    private void cargarTabla() {
+        DefaultTableModel modeloTabla = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        String titulos[] = {"Id", "Usuario", "Rol"};
+        
+        modeloTabla.setColumnIdentifiers(titulos);
+        
+        List<User> listaUsuarios = control.traerUsuarios();
+        
+        if(listaUsuarios != null) {
+            for(User u : listaUsuarios) {
+                Object[] objecto = {u.getId(), u.getUser(), u.getUnRol().getNombreRol()};
+                modeloTabla.addRow(objecto);
+            }
+            
+        }
+        
+        tablaUsuarios.setModel(modeloTabla);
+    }
 }

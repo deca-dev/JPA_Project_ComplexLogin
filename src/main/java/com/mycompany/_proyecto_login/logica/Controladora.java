@@ -29,6 +29,66 @@ public class Controladora {
         
     }
 
+    public List<User> traerUsuarios() {
+        return cp.traerUsuarios();
+    }
+
+    public List<Rol> traerRoles() {
+        return cp.traerRoles();
+    }
+
+    public void crearUsuario(String usuario, String contra, String rolRecibido) {
+        User usu = new User();
+        usu.setUser(usuario);
+        usu.setPassword(contra);
+        
+        Rol rolEncontrado = new Rol();
+        rolEncontrado = this.traerRol(rolRecibido);
+        
+        if(rolEncontrado != null) {
+            usu.setUnRol(rolEncontrado);
+        }
+        
+        cp.crearUsuario(usu);
+    }
+
+    private Rol traerRol(String rolRecibido) {
+        cp.traerRoles();
+        List<Rol> listaRoles = cp.traerRoles();
+        
+        for(Rol rol : listaRoles) {
+            if(rol.getNombreRol().equals(rolRecibido)) {
+                return rol;
+            }
+        }
+        return null;
+    }
+
+    public void borrarUsuario(int id_usuario) {
+        cp.borrarUsuario(id_usuario);
+    }
+
+    public User traerUsuario(int id_usuario) {
+       return cp.traerUsuario(id_usuario);
+    }
+
+    public void editarUsuario(User usu, String usuario, String contra, String rolRecibido) {
+        usu.setUser(usuario);
+        usu.setPassword(contra);
+        Rol rolEncontrado = new Rol();
+        rolEncontrado = this.traerRol(rolRecibido);
+        
+        if(rolEncontrado != null) {
+            usu.setUnRol(rolEncontrado);
+        }
+        
+        cp.editarUsuario(usu);
+    }
+
+  
+
+    
+
 
     
     

@@ -6,6 +6,10 @@ package com.mycompany._proyecto_login.igu;
 
 import com.mycompany._proyecto_login.logica.Controladora;
 import com.mycompany._proyecto_login.logica.User;
+import java.util.List;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -35,7 +39,7 @@ public class PrincipalAdmin extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tablaUsuarios = new javax.swing.JTable();
         btnCrear = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnBorrar = new javax.swing.JButton();
@@ -53,7 +57,7 @@ public class PrincipalAdmin extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Helvetica Neue", 0, 36)); // NOI18N
         jLabel1.setText("Sistema Administrador de Usuarios");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaUsuarios.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
                 {},
@@ -64,13 +68,28 @@ public class PrincipalAdmin extends javax.swing.JFrame {
 
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tablaUsuarios);
 
         btnCrear.setText("Crear Usuario");
+        btnCrear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCrearActionPerformed(evt);
+            }
+        });
 
         btnEditar.setText("Editar Usuario");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         btnBorrar.setText("Borrar Usuario");
+        btnBorrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBorrarActionPerformed(evt);
+            }
+        });
 
         btnSalir.setText("Salir");
         btnSalir.addActionListener(new java.awt.event.ActionListener() {
@@ -80,6 +99,11 @@ public class PrincipalAdmin extends javax.swing.JFrame {
         });
 
         btnRecargar.setText("Recargar Tabla");
+        btnRecargar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRecargarActionPerformed(evt);
+            }
+        });
 
         txtNombreUser.setEditable(false);
         txtNombreUser.setForeground(new java.awt.Color(59, 64, 68));
@@ -151,12 +175,57 @@ public class PrincipalAdmin extends javax.swing.JFrame {
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
         this.txtNombreUser.setText(usr.getUser());
+        cargarTabla();
     }//GEN-LAST:event_formWindowOpened
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void btnRecargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRecargarActionPerformed
+        cargarTabla();
+    }//GEN-LAST:event_btnRecargarActionPerformed
+
+    private void btnCrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActionPerformed
+        AltaUsuarios au = new AltaUsuarios(control);
+        au.setVisible(true);
+        au.setLocationRelativeTo(null);
+        //this.dispose();
+    }//GEN-LAST:event_btnCrearActionPerformed
+
+    private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
+        if(tablaUsuarios.getRowCount() > 0) {
+            if(tablaUsuarios.getSelectedRow() != -1) {
+                int id_usuario = Integer.parseInt(String.valueOf(tablaUsuarios.getValueAt(tablaUsuarios.getSelectedRow(), 0)));
+                control.borrarUsuario(id_usuario);
+                mostrarMensaje("Se borró ok", "info", "Eliminación");
+                cargarTabla();
+            } else {
+                mostrarMensaje("No seleccionó nada", "Error", "Error al borrar");
+            }
+        } else {
+         mostrarMensaje("Tabla vacía", "Error", "Error al borrar");
+        }
+    }//GEN-LAST:event_btnBorrarActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+           if(tablaUsuarios.getRowCount() > 0) {
+            if(tablaUsuarios.getSelectedRow() != -1) {
+                int id_usuario = Integer.parseInt(String.valueOf(tablaUsuarios.getValueAt(tablaUsuarios.getSelectedRow(), 0)));
+                
+                EdicionUsuarios eu = new EdicionUsuarios(control, id_usuario);
+                eu.setVisible(true);
+                eu.setLocationRelativeTo(null);
+                
+               
+            } else {
+                mostrarMensaje("No seleccionó nada", "Error", "Error al editar");
+            }
+        } else {
+         mostrarMensaje("Tabla vacía", "Error", "Error al editar");
+        }
+    }//GEN-LAST:event_btnEditarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -168,7 +237,45 @@ public class PrincipalAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tablaUsuarios;
     private javax.swing.JTextField txtNombreUser;
     // End of variables declaration//GEN-END:variables
+
+    private void cargarTabla() {
+        DefaultTableModel modeloTabla = new DefaultTableModel() {
+             @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        String titulos[] = {"Id", "Usuario", "Rol"};
+        
+        modeloTabla.setColumnIdentifiers(titulos);
+        
+        List<User> listaUsuarios = control.traerUsuarios();
+        
+        if(listaUsuarios != null) {
+            for(User u : listaUsuarios) {
+                Object[] objecto = {u.getId(), u.getUser(), u.getUnRol().getNombreRol()};
+                modeloTabla.addRow(objecto);
+            }
+            
+        }
+        
+        tablaUsuarios.setModel(modeloTabla);
+    }
+    
+    public void mostrarMensaje(String mensaje, String tipo, String titulo) {
+        JOptionPane optionPane = new JOptionPane(mensaje);
+        if(tipo.equals( "Info")) {
+            optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+        } else if (tipo.equals( "Error")) {
+            optionPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+        }
+        
+        JDialog dialog = optionPane.createDialog(titulo);
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
+    }
 }
